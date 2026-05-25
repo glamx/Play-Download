@@ -25,16 +25,30 @@ app.post("/info", (req, res) => {
 
   const url = req.body.url;
 
-const command = `yt-dlp --dump-json "${url}"`;
+  const command = `
+  yt-dlp
+  --user-agent "Mozilla/5.0"
+  --dump-json
+  --no-playlist
+  "${url}"
+  `;
 
   exec(command, (error, stdout) => {
 
     if (error) {
 
-      console.log(error);
+      console.log(error.stderr || error);
 
       return res.status(500).json({
         error: "Erro ao buscar vídeo"
+      });
+
+    }
+
+    if (!stdout) {
+
+      return res.status(500).json({
+        error: "Nenhum dado retornado"
       });
 
     }
