@@ -91,6 +91,6 @@ app.get("/convert", (req, res) => {
 });
 
 
-server.listen(PORT, () => {
+app.listen(PORT, () => {
   console.log("Servidor rodando");
 });
