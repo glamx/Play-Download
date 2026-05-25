@@ -25,8 +25,7 @@ app.post("/info", (req, res) => {
 
   const url = req.body.url;
 
-  const command =
-`yt-dlp --no-playlist --extract-audio --audio-format mp3 --ffmpeg-location /usr/bin/ffmpeg -o "${outputPath}" "${url}"`;
+const command = `yt-dlp --dump-json "${url}"`;
 
   exec(command, (error, stdout) => {
 
