@@ -4,7 +4,7 @@ const fs = require("fs");
 
 const app = express();
 
-const port = process.env.PORT || 4000;
+const PORT = process.env.PORT || 4000;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
