@@ -25,15 +25,7 @@ app.post("/info", (req, res) => {
 
   const url = req.body.url;
 
-const command = `
-yt-dlp 
---user-agent "Mozilla/5.0"
---extract-audio
---audio-format mp3
---no-playlist
--o "${outputPath}"
-"${url}"
-`;
+const command = `yt-dlp --dump-json "${url}"`;
 
   exec(command, (error, stdout) => {
 
@@ -75,8 +67,15 @@ app.get("/convert", (req, res) => {
 
   const outputPath = `downloads/${fileName}`;
 
-  const command =
-  `yt-dlp -x --audio-format mp3 -o "${outputPath}" "${url}"`;
+ const command = `
+yt-dlp
+--user-agent "Mozilla/5.0"
+--extract-audio
+--audio-format mp3
+--no-playlist
+-o "${outputPath}"
+"${url}"
+`;
 
   exec(command, (error) => {
 
