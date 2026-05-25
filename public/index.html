@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>YouTube MP3</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Poppins',sans-serif;
+}
+
+body{
+
+background:#0f172a;
+color:white;
+
+min-height:100vh;
+
+display:flex;
+justify-content:center;
+align-items:center;
+
+padding:20px;
+
+}
+
+.container{
+
+width:100%;
+max-width:550px;
+
+background:#1e293b;
+
+padding:35px;
+
+border-radius:25px;
+
+box-shadow:0 0 40px rgba(0,0,0,0.3);
+
+}
+
+h1{
+text-align:center;
+margin-bottom:10px;
+}
+
+.subtitle{
+
+text-align:center;
+opacity:0.7;
+
+margin-bottom:25px;
+
+}
+
+.input-area{
+
+display:flex;
+flex-direction:column;
+gap:15px;
+
+}
+
+input{
+
+padding:16px;
+
+border:none;
+outline:none;
+
+border-radius:12px;
+
+background:#0f172a;
+
+color:white;
+
+}
+
+button{
+
+padding:16px;
+
+border:none;
+
+border-radius:12px;
+
+background:#ef4444;
+
+color:white;
+
+font-weight:600;
+
+cursor:pointer;
+
+transition:0.3s;
+
+}
+
+button:hover{
+
+background:#dc2626;
+
+}
+
+.video-card{
+
+display:none;
+
+margin-top:30px;
+
+background:#0f172a;
+
+padding:20px;
+
+border-radius:20px;
+
+}
+
+.video-card img{
+
+width:100%;
+border-radius:15px;
+
+margin-bottom:15px;
+
+}
+
+.loading{
+
+display:none;
+
+margin-top:20px;
+
+text-align:center;
+
+}
+
+</style>
+
+</head>
+<body>
+
+<div class="container">
+
+<h1>🎵 YouTube MP3</h1>
+
+<p class="subtitle">
+Converta vídeos rapidamente
+</p>
+
+<div class="input-area">
+
+<input
+type="text"
+id="url"
+placeholder="Cole o link do YouTube"
+>
+
+<button onclick="fetchVideoInfo()">
+Buscar Vídeo
+</button>
+
+</div>
+
+
+<div class="loading" id="loading">
+⏳ Carregando...
+</div>
+
+
+<div class="video-card" id="videoCard">
+
+<img id="thumb">
+
+<h3 id="title"></h3>
+
+<p id="channel"></p>
+
+<p id="duration"></p>
+
+<br>
+
+<button onclick="downloadMP3()">
+Baixar MP3
+</button>
+
+</div>
+
+</div>
+
+
+<script>
+
+let currentURL = "";
+
+async function fetchVideoInfo(){
+
+const url = document.getElementById("url").value;
+
+currentURL = url;
+
+document.getElementById("loading").style.display = "block";
+
+const response = await fetch("/info",{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify({url})
+
+});
+
+const data = await response.json();
+
+document.getElementById("loading").style.display = "none";
+
+document.getElementById("videoCard").style.display = "block";
+
+document.getElementById("thumb").src = data.thumbnail;
+
+document.getElementById("title").innerText = data.title;
+
+document.getElementById("channel").innerText =
+"Canal: " + data.channel;
+
+document.getElementById("duration").innerText =
+"Duração: " + data.duration;
+
+}
+
+
+function downloadMP3(){
+
+window.location =
+`/convert?url=${encodeURIComponent(currentURL)}`;
+
+}
+
+</script>
+
+</body>
+</html>
