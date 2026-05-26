@@ -105,6 +105,8 @@ app.get("/convert", (req, res) => {
 
       const data = JSON.parse(body.toString());
 
+      console.log(data);
+
       if (!data.url) {
 
         return res.status(500).json({
