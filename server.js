@@ -1,6 +1,5 @@
 const express = require("express");
-const { exec } = require("child_process");
-const fs = require("fs");
+const https = require("https");
 
 const app = express();
 
@@ -20,57 +19,55 @@ app.get("/", (req, res) => {
 });
 
 
-
-if (!fs.existsSync("downloads")) {
-  fs.mkdirSync("downloads");
-}
-
-
-
-
-
 // PEGAR INFO DO VIDEO
 app.post("/info", (req, res) => {
 
-  const url = req.body.url;
+  const videoUrl = req.body.url;
 
-  const command = `yt-dlp --user-agent "Mozilla/5.0" --dump-json --no-playlist "${url}"`;
+  const videoId = videoUrl.split("v=")[1];
 
-  exec(command, (error, stdout) => {
-
-    if (error) {
-
-      console.log(error.stderr || error);
-
-      return res.status(500).json({
-        error: "Erro ao buscar vídeo"
-      });
-
+  const options = {
+    method: "GET",
+    hostname: "cloud-api-hub-youtube-downloader.p.rapidapi.com",
+    path: `/video?id=${videoId}`,
+    headers: {
+      "x-rapidapi-key": process.env.RAPIDAPI_KEY,
+      "x-rapidapi-host":
+      "cloud-api-hub-youtube-downloader.p.rapidapi.com"
     }
+  };
 
-    if (!stdout) {
+  const apiReq = https.request(options, function (apiRes) {
 
-      return res.status(500).json({
-        error: "Nenhum dado retornado"
+    const chunks = [];
+
+    apiRes.on("data", function (chunk) {
+      chunks.push(chunk);
+    });
+
+    apiRes.on("end", function () {
+
+      const body = Buffer.concat(chunks);
+
+      const data = JSON.parse(body.toString());
+
+      res.json({
+
+        title: data.title,
+
+        thumbnail: data.thumbnail,
+
+        channel: data.author,
+
+        duration: data.lengthSeconds
+
       });
-
-    }
-
-    const data = JSON.parse(stdout);
-
-    res.json({
-
-      title: data.title,
-
-      thumbnail: data.thumbnail,
-
-      channel: data.uploader,
-
-      duration: data.duration_string
 
     });
 
   });
+
+  apiReq.end();
 
 });
 
@@ -78,37 +75,53 @@ app.post("/info", (req, res) => {
 // CONVERTER
 app.get("/convert", (req, res) => {
 
-  const url = req.query.url;
+  const videoUrl = req.query.url;
 
-  const fileName = `audio-${Date.now()}.mp3`;
+  const videoId = videoUrl.split("v=")[1];
 
-  const outputPath = `downloads/${fileName}`;
-
- const command = `yt-dlp --user-agent "Mozilla/5.0" --extract-audio --audio-format mp3 --no-playlist -o "${outputPath}" "${url}"`;
-
-  exec(command, (error) => {
-
-    if (error) {
-
-      console.log(error);
-
-      return res.status(500).send("Erro");
-
+  const options = {
+    method: "GET",
+    hostname: "cloud-api-hub-youtube-downloader.p.rapidapi.com",
+    path:
+    `/download?id=${videoId}&filter=audioonly&quality=highest`,
+    headers: {
+      "x-rapidapi-key": process.env.RAPIDAPI_KEY,
+      "x-rapidapi-host":
+      "cloud-api-hub-youtube-downloader.p.rapidapi.com"
     }
+  };
 
-    res.download(outputPath, "audio.mp3", () => {
+  const apiReq = https.request(options, function (apiRes) {
 
-      fs.unlinkSync(outputPath);
+    const chunks = [];
+
+    apiRes.on("data", function (chunk) {
+      chunks.push(chunk);
+    });
+
+    apiRes.on("end", function () {
+
+      const body = Buffer.concat(chunks);
+
+      const data = JSON.parse(body.toString());
+
+      if (!data.url) {
+
+        return res.status(500).json({
+          error: "Erro ao converter"
+        });
+
+      }
+
+      res.redirect(data.url);
 
     });
 
   });
 
+  apiReq.end();
+
 });
-
-
-
-
 
 
 app.listen(PORT, () => {
