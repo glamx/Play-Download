@@ -82,12 +82,11 @@ app.get("/convert", (req, res) => {
 
   const options = {
     method: "GET",
-    hostname: "cloud-api-hub-youtube-downloader.p.rapidapi.com",
-    path: `/download?id=${videoId}&filter=audioonly&quality=highest`,
+    hostname: "youtube-mp36.p.rapidapi.com",
+    path: `/dl?id=${videoId}`,
     headers: {
       "x-rapidapi-key": process.env.RAPIDAPI_KEY,
-      "x-rapidapi-host":
-      "cloud-api-hub-youtube-downloader.p.rapidapi.com"
+      "x-rapidapi-host": "youtube-mp36.p.rapidapi.com"
     }
   };
 
@@ -105,9 +104,9 @@ app.get("/convert", (req, res) => {
 
       const data = JSON.parse(body.toString());
 
-      console.log(JSON.stringify(data, null, 2));
+      console.log(data);
 
-      if (!data.url) {
+      if (!data.link) {
 
         return res.status(500).json({
           error: "Erro ao converter"
@@ -115,7 +114,7 @@ app.get("/convert", (req, res) => {
 
       }
 
-      res.redirect(data.url);
+      res.redirect(data.link);
 
     });
 
