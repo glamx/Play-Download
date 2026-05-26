@@ -21,6 +21,10 @@ app.get("/", (req, res) => {
 
 
 
+if (!fs.existsSync("downloads")) {
+  fs.mkdirSync("downloads");
+}
+
 
 
 
