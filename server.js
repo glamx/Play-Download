@@ -24,7 +24,7 @@ app.post("/info", (req, res) => {
 
   const videoUrl = req.body.url;
 
-  const videoId = videoUrl.split("v=")[1];
+const videoId = new URL(videoUrl).searchParams.get("v");
 
   const options = {
   method: 'GET',
@@ -78,7 +78,7 @@ app.get("/convert", (req, res) => {
 
   const videoUrl = req.query.url;
 
-  const videoId = videoUrl.split("v=")[1];
+  const videoId = new URL(videoUrl).searchParams.get("v");
 
   const options = {
     method: "GET",
