@@ -20,6 +20,11 @@ app.get("/", (req, res) => {
 });
 
 
+
+
+
+
+
 // PEGAR INFO DO VIDEO
 app.post("/info", (req, res) => {
 
@@ -96,6 +101,10 @@ app.get("/convert", (req, res) => {
   });
 
 });
+
+
+
+
 
 
 app.listen(PORT, () => {
