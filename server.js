@@ -29,7 +29,7 @@ const videoId = new URL(videoUrl).searchParams.get("v");
   const options = {
   method: 'GET',
   hostname: 'cloud-api-hub-youtube-downloader.p.rapidapi.com',
-  path: `/download?id=${videoId}&filter=audioonly&quality=highest`,
+ path: `/video?id=${videoId}`,
   headers: {
     'x-rapidapi-key': process.env.RAPIDAPI_KEY,
     'x-rapidapi-host':
@@ -83,7 +83,7 @@ app.get("/convert", (req, res) => {
   const options = {
     method: "GET",
     hostname: "cloud-api-hub-youtube-downloader.p.rapidapi.com",
-    path: `/video?id=${videoId}`,
+    path: `/download?id=${videoId}&filter=audioonly&quality=highest`,
     headers: {
       "x-rapidapi-key": process.env.RAPIDAPI_KEY,
       "x-rapidapi-host":
