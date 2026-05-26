@@ -27,15 +27,16 @@ app.post("/info", (req, res) => {
   const videoId = videoUrl.split("v=")[1];
 
   const options = {
-    method: "GET",
-    hostname: "cloud-api-hub-youtube-downloader.p.rapidapi.com",
-    path: `/video?id=${videoId}`,
-    headers: {
-      "x-rapidapi-key": process.env.RAPIDAPI_KEY,
-      "x-rapidapi-host":
-      "cloud-api-hub-youtube-downloader.p.rapidapi.com"
-    }
-  };
+  method: 'GET',
+  hostname: 'cloud-api-hub-youtube-downloader.p.rapidapi.com',
+  path: `/download?id=${videoId}&filter=audioonly&quality=highest`,
+  headers: {
+    'x-rapidapi-key': process.env.RAPIDAPI_KEY,
+    'x-rapidapi-host':
+    'cloud-api-hub-youtube-downloader.p.rapidapi.com',
+    'Content-Type': 'application/json'
+  }
+};
 
   const apiReq = https.request(options, function (apiRes) {
 
