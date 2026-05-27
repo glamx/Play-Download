@@ -20,56 +20,31 @@ app.get("/", (req, res) => {
 
 
 // PEGAR INFO DO VIDEO
+
+
 app.post("/info", (req, res) => {
 
   const videoUrl = req.body.url;
 
-const videoId = new URL(videoUrl).searchParams.get("v");
+  const videoId = new URL(videoUrl)
+    .searchParams.get("v");
 
-  const options = {
-  method: 'GET',
-  hostname: 'cloud-api-hub-youtube-downloader.p.rapidapi.com',
- path: `/video?id=${videoId}`,
-  headers: {
-    'x-rapidapi-key': process.env.RAPIDAPI_KEY,
-    'x-rapidapi-host':
-    'cloud-api-hub-youtube-downloader.p.rapidapi.com',
-    'Content-Type': 'application/json'
+  if (!videoId) {
+
+    return res.status(400).json({
+      error: "URL inválida"
+    });
+
   }
-};
 
-  const apiReq = https.request(options, function (apiRes) {
+  const thumbnail =
+  `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
 
-    const chunks = [];
+  res.json({
 
-    apiRes.on("data", function (chunk) {
-      chunks.push(chunk);
-    });
-
-   apiRes.on("end", function () {
-
-      const body = Buffer.concat(chunks);
-
-      const data = JSON.parse(body.toString());
-
-      res.json({
-
-        title: data.title,
-
-        thumbnail: data.thumbnail,
-
-        channel: data.author,
-
-        duration: data.lengthSeconds
-
-      });
-
-    });
-
+    thumbnail: thumbnail
 
   });
-
-  apiReq.end();
 
 });
 
