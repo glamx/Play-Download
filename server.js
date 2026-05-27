@@ -74,7 +74,7 @@ const videoId = new URL(videoUrl).searchParams.get("v");
 
 
 // CONVERTER
-app.get("/convert", (req, res) => {
+app.get("/convert", async (req, res) => {
 
   const videoUrl = req.query.url;
 
@@ -83,46 +83,97 @@ app.get("/convert", (req, res) => {
   const options = {
     method: "GET",
     hostname: "youtube-mp36.p.rapidapi.com",
-    path: `/dl?id=${videoId}`,
     headers: {
       "x-rapidapi-key": process.env.RAPIDAPI_KEY,
       "x-rapidapi-host": "youtube-mp36.p.rapidapi.com"
     }
   };
 
-  const apiReq = https.request(options, function (apiRes) {
+  function requestApi() {
 
-    const chunks = [];
+    return new Promise((resolve, reject) => {
 
-    apiRes.on("data", function (chunk) {
-      chunks.push(chunk);
+      options.path = `/dl?id=${videoId}`;
+
+      const apiReq = https.request(options, function (apiRes) {
+
+        const chunks = [];
+
+        apiRes.on("data", function (chunk) {
+          chunks.push(chunk);
+        });
+
+        apiRes.on("end", function () {
+
+          const body = Buffer.concat(chunks);
+
+          try {
+
+            const data = JSON.parse(body.toString());
+
+            resolve(data);
+
+          } catch (err) {
+
+            reject(err);
+
+          }
+
+        });
+
+      });
+
+      apiReq.on("error", reject);
+
+      apiReq.end();
+
     });
 
-    apiRes.on("end", function () {
+  }
 
-      const body = Buffer.concat(chunks);
+  try {
 
-      const data = JSON.parse(body.toString());
+    let data;
+
+    for (let i = 0; i < 10; i++) {
+
+      data = await requestApi();
 
       console.log(data);
 
-      if (!data.link) {
+      if (data.link) {
 
-        return res.status(500).json({
-          error: "Erro ao converter"
-        });
+        return res.redirect(data.link);
 
       }
 
-      res.redirect(data.link);
+      await new Promise(resolve =>
+        setTimeout(resolve, 3000)
+      );
 
+    }
+
+    res.status(500).json({
+      error: "Conversão demorou demais"
     });
 
-  });
+  } catch (err) {
 
-  apiReq.end();
+    console.log(err);
+
+    res.status(500).json({
+      error: "Erro ao converter"
+    });
+
+  }
 
 });
+
+
+
+
+
+
 
 
 app.listen(PORT, () => {
