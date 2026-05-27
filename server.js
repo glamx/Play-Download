@@ -47,20 +47,25 @@ const videoId = new URL(videoUrl).searchParams.get("v");
     });
 
    apiRes.on("end", function () {
-  const body = Buffer.concat(chunks);
-  const data = JSON.parse(body.toString());
-  
-  console.log("Resposta da API:", JSON.stringify(data, null, 2)); // 👈 adicione isso temporariamente
 
-  const video = data.data || data; // tenta data.data primeiro, senão usa data direto
+      const body = Buffer.concat(chunks);
 
-  res.json({
-    title: video.title,
-    thumbnail: video.thumbnail,
-    channel: video.author,
-    duration: video.lengthSeconds
-  });
-});
+      const data = JSON.parse(body.toString());
+
+      res.json({
+
+        title: data.title,
+
+        thumbnail: data.thumbnail,
+
+        channel: data.author,
+
+        duration: data.lengthSeconds
+
+      });
+
+    });
+
 
   });
 
